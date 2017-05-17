@@ -1,0 +1,10 @@
+{
+  "TEXT"     : "text",
+  "NUMBER"   : "number",
+  "FLOAT"    : "float",
+  "DATE"     : "date",
+  "DATETIME" : "datetime",
+  "ARRAY"    : "array",
+  "ID"       : "id",
+  "BOOLEAN"  : "boolean"
+}
