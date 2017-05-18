@@ -1,109 +1,144 @@
-const BaseModel = require('./contracts/Model');
 const _ = require('lodash');
 
 /**
- * Function which returns the model class, given the model's factory.
- * @param factory {ModelFactory}
- * @returns {Model}
+ * The base model class.
+ * @author Mike Adamczyk <mike@bom.us>
  */
-function createModelClass(factory)
+class Model
 {
-    class Model extends BaseModel
+    /**
+     * Constructor.
+     * @param attributes {object}
+     */
+    constructor(attributes)
     {
-        constructor(attributes)
-        {
-            super();
-
-            factory.schema.fields.forEach(field =>
-            {
-                this.$attributes[field.name] = field.value;
-
-                // Create getters and setters for each field in the schema.
-                // When values change, the instance is marked as modified.
-                Object.defineProperty(this, field.name, {
-
-                    enumerable: true,
-
-                    /**
-                     * Getter, which returns value from attributes hash.
-                     * @returns {*}
-                     */
-                    get()
-                    {
-                        return this.$attributes[field.name];
-                    },
-
-                    /**
-                     * Setter, which sets value in attributes hash.
-                     * Also, marks model as modified and adds modified property.
-                     * @param newValue
-                     */
-                    set(newValue)
-                    {
-                        this.$new = false;
-                        this.$attributes[field.name] = newValue;
-
-                        if (! this.$modified.includes(field.name)) {
-                            this.$modified.push(field.name);
-                        }
-                    }
-                });
-            });
-
-            // Fill the values.
-            _.assign(this.$attributes,attributes);
-        }
+        /**
+         * Is this a newly created model, not modified?
+         * @type {boolean}
+         */
+        this.$new = true;
 
         /**
-         * Returns the model schema.
-         * @returns {Schema}
+         * Array of modified attributes.
+         * @type {Array<string>}
          */
-        get $schema()
-        {
-            return factory.schema;
-        }
+        this.$modified = [];
 
         /**
-         * Returns the factory definition.
-         * @returns {ModelFactory}
+         * Attributes map.
+         * @type {{}}
          */
-        get $factory()
-        {
-            return factory;
-        }
+        this.$attributes = {};
 
-        /**
-         * Check if this model has been modified.
-         * @returns {boolean}
-         */
-        get isModified()
-        {
-            return this.$modified.length > 0;
-        }
+        // Call the private init() method.
+        init.call(this,attributes);
 
-        /**
-         * Inspection method for Node.js.
-         * @param depth {Number}
-         * @param opts {object}
-         * @returns {object}
-         */
-        inspect(depth,opts)
-        {
-            return this.toJSON();
-        }
-
-        /**
-         * Convert the model to attributes.
-         * @returns {object}
-         */
-        toJSON()
-        {
-            return this.$attributes;
-        }
+        // Fill the attribute values.
+        this.fill(attributes);
     }
 
-    return Model;
+    /**
+     * Implementation of factory getter.
+     * @throws {Error}
+     */
+    get $factory()
+    {
+        throw new Error('unimplemented $factory in Model');
+    }
+
+    /**
+     * Returns the model schema.
+     * @returns {Schema}
+     */
+    get $schema()
+    {
+        return this.$factory.schema;
+    }
+
+    /**
+     * Check if this model has been modified.
+     * @returns {boolean}
+     */
+    get isModified()
+    {
+        return this.$modified.length > 0;
+    }
+
+    /**
+     * Fill the given attributes.
+     * @param attributes {object}
+     */
+    fill(attributes)
+    {
+        _.assign(this.$attributes,attributes);
+    }
+
+    /**
+     * Inspection method for Node.js.
+     * @param depth {Number}
+     * @param opts {object}
+     * @returns {object}
+     */
+    inspect(depth,opts)
+    {
+        return this.toJSON();
+    }
+
+    /**
+     * Convert the model to attributes.
+     * @returns {object}
+     */
+    toJSON()
+    {
+        return this.$attributes;
+    }
 }
 
+/**
+ * Assigns and fills the model's attributes.
+ * @this {Model}
+ * @param attributes {object}
+ * @private
+ */
+function init(attributes)
+{
+    let factory = this.$factory;
 
-module.exports = createModelClass;
+    factory.schema.fields.forEach(field =>
+    {
+        this.$attributes[field.name] = field.value;
+
+        // Create getters and setters for each field in the schema.
+        // When values change, the instance is marked as modified.
+        Object.defineProperty(this, field.name, {
+
+            enumerable: true,
+
+            /**
+             * Getter, which returns value from attributes hash.
+             * @returns {*}
+             */
+            get()
+            {
+                return this.$attributes[field.name];
+            },
+
+            /**
+             * Setter, which sets value in attributes hash.
+             * Also, marks model as modified and adds modified property.
+             * @param newValue
+             */
+            set(newValue)
+            {
+                this.$new = false;
+                this.$attributes[field.name] = newValue;
+
+                if (! this.$modified.includes(field.name)) {
+                    this.$modified.push(field.name);
+                }
+            }
+        });
+    });
+}
+
+module.exports = Model;

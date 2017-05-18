@@ -1,9 +1,9 @@
 const Schema = require('../src/Schema');
 const Field = require('../src/Field');
 const Types = require('../src/support/types.json');
-const Driver = require('../src/Driver');
+const {MongoDBDriver} = require('../index');
 
-var driver = new Driver;
+var driver = new MongoDBDriver;
 var factory = driver.model('Test');
 var schema = factory.schema;
 

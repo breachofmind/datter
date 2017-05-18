@@ -1,13 +1,9 @@
 const EventEmitter = require('events');
-const MongoDB      = require('mongodb');
-const Promise      = require('bluebird');
+const Model        = require('./Model');
+const ModelFactory = require('./ModelFactory');
 const _            = require('lodash');
 
-const Model              = require('./contracts/Model');
-const createModelClass   = require('./Model');
-const createFactoryClass = require('./ModelFactory');
-
-class Driver extends EventEmitter
+class Database extends EventEmitter
 {
     /**
      * Constructor.
@@ -18,8 +14,8 @@ class Driver extends EventEmitter
         super();
 
         /**
-         * If connected, holds the database connection object.
-         * @type {null|MongoDB}
+         * If connected, holds the database connection instance.
+         * @type {null|*}
          * @private
          */
         this._db = null;
@@ -39,6 +35,8 @@ class Driver extends EventEmitter
         this._models = {};
     }
 
+
+
     /**
      * Check if the database is connected.
      * @returns {boolean}
@@ -52,9 +50,18 @@ class Driver extends EventEmitter
      * Return the protected database connection.
      * @returns {null|Db}
      */
-    get db()
+    get instance()
     {
         return this._db;
+    }
+
+    /**
+     * Set the database instance.
+     * @param value {null|Db}
+     */
+    set instance(value)
+    {
+        this._db = value;
     }
 
     /**
@@ -76,27 +83,23 @@ class Driver extends EventEmitter
     }
 
     /**
+     * Return an array of model factories.
+     * @returns {Array<ModelFactory>}
+     */
+    toArray()
+    {
+        return _.map(this._models, (value,key) => {
+            return value;
+        });
+    }
+
+    /**
      * Connect to the database.
      * @returns {Promise}
      */
     connect()
     {
-        if (this.connected) {
-            return Promise.resolve(this._db);
-        }
-        return new Promise((resolve,reject) =>
-        {
-            MongoDB.MongoClient.connect(this._url, (err,db) => {
-                if (err) {
-                    this.emit('error', err);
-                    return reject(err);
-                }
-                this._db = db;
-                this.emit('connect', db);
-
-                return resolve(db);
-            })
-        })
+        throw new Error('Database.connect() not implemented');
     }
 
     /**
@@ -105,15 +108,18 @@ class Driver extends EventEmitter
      */
     disconnect()
     {
-        if (this.connected) {
-            return this._db.logout().then(result => {
-                this._db = null;
-                return result;
-            });
-        }
-        return Promise.resolve(true);
+        throw new Error('Database.disconnect() not implemented');
     }
 
+    /**
+     * Return a class constructor for a model.
+     * @param factory {ModelFactory}
+     * @returns {Model}
+     */
+    getModelClass(factory)
+    {
+        throw new Error('Database.getModelClass() not implemented');
+    }
 
     /**
      * Create a new model with the given schema.
@@ -122,15 +128,16 @@ class Driver extends EventEmitter
      */
     model(name)
     {
-        let factory = createFactoryClass(name);
+        let factory = new ModelFactory(name, this);
+        let Model = this.getModelClass(factory);
 
         // Assign a property on the factory the model class constructor.
         Object.defineProperty(factory,'model', {
-            value: createModelClass(factory)
+            value: Model
         });
 
-        return this._models[name] = factory;
+        return this._models[factory.name] = factory;
     }
 }
 
-module.exports = Driver;
+module.exports = Database;

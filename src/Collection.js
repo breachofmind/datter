@@ -1,5 +1,4 @@
-const Model        = require('./contracts/Model');
-const ModelFactory = require('./contracts/ModelFactory');
+const Model = require('./Model');
 
 
 class Collection extends Array
@@ -25,10 +24,16 @@ class Collection extends Array
      * Return the protected model class.
      * @returns {null|ModelFactory}
      */
-    get model() {
+    get model()
+    {
         return this._model;
     }
 
+    /**
+     * Add a new item to the collection.
+     * @param item {Model|Array}
+     * @returns {Collection}
+     */
     add(item)
     {
         // Adding an array items.

@@ -1,1 +1,1 @@
-"use strict";
+exports.MongoDBDriver = require('./src/drivers/MongoDBDriver');

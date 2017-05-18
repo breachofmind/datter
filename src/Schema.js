@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const Field = require('./Field');
-const Driver = require('./Driver');
 const Types = require('./support/types.json');
 
 class Schema extends Map
