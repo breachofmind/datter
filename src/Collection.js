@@ -11,34 +11,26 @@ class Collection extends Array
     {
         super();
 
-        /**
-         * The parent model's factory class.
-         * @type {null|Factory}
-         */
-        this._factory = null;
-
         this.add(items);
     }
 
     /**
-     * Return the protected model class.
+     * Return the protected factory instance.
+     * The first item in the array is used to return the factory instance.
      * @returns {null|Factory}
      */
     get factory()
     {
-        return this._factory;
+        return this.isEmpty ? null : this[0].$factory;
     }
 
     /**
      * Return the model class.
-     * @returns {Model|undefined}
+     * @returns {null|Model}
      */
     get model()
     {
-        if (! this._factory) {
-            return undefined;
-        }
-        return this._factory.model;
+        return this.isEmpty ? null : this.factory.model;
     }
 
     /**
@@ -51,12 +43,25 @@ class Collection extends Array
     }
 
     /**
+     * Filter this collection given the parameters and return a new collection.
+     * @param where
+     * @returns {Collection}
+     */
+    filter(where={})
+    {
+        return new Collection( _.filter(this,where) );
+    }
+
+    /**
      * Add a new item to the collection.
      * @param item {Model|Array}
      * @returns {Collection}
      */
     add(item)
     {
+        if (! item) {
+            return this;
+        }
         // Adding an array items.
         if (Array.isArray(item)) {
             item.forEach(this.add.bind(this));

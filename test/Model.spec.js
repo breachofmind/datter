@@ -2,6 +2,7 @@ const {MongoDBDriver} = require('../index');
 const Factory         = require('../src/Factory');
 const Model           = require('../src/Model');
 const Schema          = require('../src/Schema');
+const Collection      = require('../src/Collection');
 
 const DB_NAME = "expressway";
 const DB_URL  = "mongodb://localhost:27017/"+DB_NAME;
@@ -78,4 +79,36 @@ describe('MongoDBModel.js', () => {
 
 describe('MongoDBModel.js database methods', () => {
 
+    let driver,factory;
+    beforeAll(done => {
+        driver = new MongoDBDriver(DB_URL);
+
+        factory = driver.model('Post', schema => {
+            this.table = "post";
+            schema
+                .text('title')
+                .text('slug')
+                .text('excerpt');
+        });
+
+        driver.connect().then(done);
+    });
+
+    afterAll(done => {
+        driver.disconnect().then(done);
+    });
+
+    it("should return data!", (done) => {
+
+        factory.model.all().then(results => {
+            expect(results instanceof Collection).toBe(true);
+            expect(results.length).toBeGreaterThan(0);
+            expect(results[0] instanceof Model).toBe(true);
+            expect(results[0] instanceof factory.model).toBe(true);
+
+            done();
+        })
+
+
+    });
 });

@@ -30,11 +30,8 @@ class Model
          */
         this.$attributes = {};
 
-        // Call the private init() method.
-        // Fill the attribute values.
-        init.call(this,attributes);
-
-        this.fill(attributes);
+        // Initialize this model.
+        fill.call(this,attributes);
     }
 
     /**
@@ -76,15 +73,6 @@ class Model
     }
 
     /**
-     * Fill the given attributes.
-     * @param attributes {object}
-     */
-    fill(attributes)
-    {
-        _.assign(this.$attributes,attributes);
-    }
-
-    /**
      * Inspection method for Node.js.
      * @param depth {Number}
      * @param opts {object}
@@ -111,7 +99,7 @@ class Model
  * @param attributes {object}
  * @private
  */
-function init(attributes)
+function fill(attributes)
 {
     let factory = this.$factory;
 
@@ -148,6 +136,12 @@ function init(attributes)
                 }
             }
         });
+
+        // Fill the model attributes.
+        // But only use attributes that are in the schema.
+        if(attributes[field.name]) {
+            this.$attributes[field.name] = attributes[field.name];
+        }
     });
 }
 
