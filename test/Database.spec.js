@@ -1,9 +1,10 @@
 const {MongoDBDriver} = require('../index');
+const ModelFactory    = require('../src/ModelFactory');
+const Model           = require('../src/Model');
+const Schema          = require('../src/Schema');
+
 const DB_NAME = "expressway";
-const DB_URL = "mongodb://localhost:27017/"+DB_NAME;
-const ModelFactory = require('../src/ModelFactory');
-const Model = require('../src/Model');
-const Schema = require('../src/Schema');
+const DB_URL  = "mongodb://localhost:27017/"+DB_NAME;
 
 describe('MongoDBDriver.js', function()
 {
@@ -17,13 +18,13 @@ describe('MongoDBDriver.js', function()
     });
 
     it("is an instance of Database", () => {
+        driver = new MongoDBDriver(DB_URL);
         expect(MongoDBDriver instanceof Function).toBe(true);
+        expect(driver instanceof MongoDBDriver).toBe(true);
     });
 
     it("should connect to database", (done) =>
     {
-        driver = new MongoDBDriver(DB_URL);
-
         expect(driver.url).toEqual(DB_URL);
 
         driver.connect().then(db =>

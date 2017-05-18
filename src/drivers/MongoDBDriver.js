@@ -51,7 +51,7 @@ class MongoDBDriver extends Database
      */
     getModelClass(factory)
     {
-        return modelFn(factory);
+        return modelFn(factory,this);
     }
 }
 
