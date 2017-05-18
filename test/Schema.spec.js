@@ -1,8 +1,11 @@
 const Schema = require('../src/Schema');
 const Field = require('../src/Field');
 const Types = require('../src/support/types.json');
+const Driver = require('../src/Driver');
 
-var schema = new Schema;
+var driver = new Driver;
+var factory = driver.model('Test');
+var schema = factory.schema;
 
 describe("Schema.js", () => {
 
@@ -104,7 +107,7 @@ describe("Schema.js", () => {
         schema.text('fn_field', fn);
     });
 
-    it("should allow field booelan values to be configured with strings of property names", () => {
+    it("should allow field boolean values to be configured with strings of property names", () => {
         schema.text('str_field', 'required');
         expect(getProp('str_field', 'required')).toBe(true);
     });
@@ -129,10 +132,11 @@ describe("Schema.js", () => {
     });
 
     it("should return array of field instances in priority order with fields property", () => {
-        let testSchema = new Schema;
-        testSchema.text('field_one', 5);
-        testSchema.text('field_two', 1);
-        testSchema.text('field_three',7);
+        let testSchema = driver.model('Foo')
+            .schema
+            .text('field_one', 5)
+            .text('field_two', 1)
+            .text('field_three',7);
 
         let fields = testSchema.fields;
 
@@ -144,10 +148,11 @@ describe("Schema.js", () => {
     });
 
     it("should return a filtered array of fields given parameters", () => {
-        let testSchema = new Schema;
-        testSchema.text('field_one', [1,'required']);
-        testSchema.text('field_two', [2, 'unique']);
-        testSchema.number('field_three',[3, 'required', 'unique']);
+        let testSchema = driver.model('Bar')
+            .schema
+            .text('field_one', [1,'required'])
+            .text('field_two', [2, 'unique'])
+            .number('field_three',[3, 'required', 'unique']);
 
         let filterOne = testSchema.filter('required');
         let filterTwo = testSchema.filter({type:Types.TEXT});

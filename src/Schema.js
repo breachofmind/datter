@@ -5,11 +5,17 @@ const Types = require('./support/types.json');
 
 class Schema extends Map
 {
-    constructor()
+    constructor(factory)
     {
         super();
 
-        this._driver = null;
+        /**
+         * Return the protected factory instance.
+         * @type {ModelFactory}
+         */
+        Object.defineProperty(this, 'factory', {
+            value: factory
+        });
     }
 
     /**
@@ -21,27 +27,6 @@ class Schema extends Map
         return this.each(field => {
             return field;
         }).sort(sortByPriority);
-    }
-
-    /**
-     * Return the protected driver instance.
-     * @returns {Driver}
-     */
-    get driver()
-    {
-        return this._driver;
-    }
-
-    /**
-     * Set the protected driver instance.
-     * @param value {Driver}
-     */
-    set driver(value)
-    {
-        if (! (value instanceof Driver)) {
-            throw new TypeError('value must be instance of Driver');
-        }
-        this._driver = value;
     }
 
     /**
@@ -75,7 +60,7 @@ class Schema extends Map
 
     /**
      * Return a filtered array, given the parameters.
-     * @see lodash filter()
+     * @see https://lodash.com/docs/4.17.4#filter
      * @param where {object|function|string}
      * @returns {Array}
      */
@@ -165,10 +150,20 @@ class Schema extends Map
             opts,
         ]);
     }
+
+    /**
+     * Convert this object to a JSON array.
+     * @returns {Array.<Field>}
+     */
+    toJSON()
+    {
+        return this.fields;
+    }
 }
 
 
-// Setup simple helper methods for Schema prototype.
+// Setup simple helper methods
+// for Schema prototype.
 [
     Types.TEXT,
     Types.NUMBER,
@@ -182,9 +177,6 @@ class Schema extends Map
         return this.field(fieldName, methodName, opts);
     }
 });
-
-
-
 
 
 /**

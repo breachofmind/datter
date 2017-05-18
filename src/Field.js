@@ -11,7 +11,7 @@ class Field
     constructor(name, type, schema)
     {
         if (! values.includes(type)) {
-            throw new TypeError('type is not valid: '+type);
+            throw new TypeError('field type is not valid: '+type);
         }
 
         /**
@@ -71,6 +71,22 @@ class Field
          * @type {string}
          */
         this.foreignKey = "_id";
+
+        /**
+         * The default value for the field.
+         * @type {null}
+         */
+        this.value = null;
+    }
+
+    get factory()
+    {
+        return this.schema.factory;
+    }
+
+    get models()
+    {
+        return this.factory.driver.models;
     }
 
     /**

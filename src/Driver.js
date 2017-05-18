@@ -118,12 +118,11 @@ class Driver extends EventEmitter
     /**
      * Create a new model with the given schema.
      * @param name {string}
-     * @param schema
      * @returns {ModelFactory}
      */
-    model(name,schema)
+    model(name)
     {
-        let factory = createFactoryClass(name,schema);
+        let factory = createFactoryClass(name);
 
         // Assign a property on the factory the model class constructor.
         Object.defineProperty(factory,'model', {

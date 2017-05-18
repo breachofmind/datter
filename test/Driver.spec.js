@@ -3,6 +3,7 @@ const DB_NAME = "expressway";
 const DB_URL = "mongodb://localhost:27017/"+DB_NAME;
 const ModelFactory = require('../src/contracts/ModelFactory');
 const Model = require('../src/contracts/Model');
+const Schema = require('../src/Schema');
 
 describe('Driver.js', function()
 {
@@ -66,11 +67,7 @@ describe('Driver.js Model factory', function()
 {
     let driver,factory;
     let testModelName = "Post";
-    let testSchema = {
-        title: String,
-        slug: String,
-        author: Number
-    };
+
     beforeAll(done => {
         driver = new Driver(DB_URL);
         driver.connect().then(done);
@@ -80,19 +77,24 @@ describe('Driver.js Model factory', function()
     });
 
     it("should create a model factory class", () => {
-        factory = driver.model(testModelName,testSchema);
+        factory = driver.model(testModelName);
         expect(factory instanceof ModelFactory).toBe(true);
         expect(factory.name).toEqual(testModelName);
         expect(driver.models[testModelName]).toEqual(factory);
     });
+    it("should create a schema instance in the factory", () => {
+        expect(factory.schema instanceof Schema).toBe(true);
+    });
 
     it("should create a model constructor on the factory instance", () => {
         expect(factory.model).not.toBeUndefined();
-        expect(typeof factory.model).toEqual("function")
+        expect(typeof factory.model).toEqual("function");
     });
 
     it("should create model instances with create() method", () => {
         let model = factory.create();
         expect(model instanceof Model).toBe(true);
+        expect(model instanceof factory.model).toBe(true);
+        expect(model.$factory).toBe(factory);
     });
 });

@@ -1,7 +1,7 @@
 const BaseModelFactory = require('./contracts/ModelFactory');
 const _ = require('lodash');
 
-function createFactoryClass(name,schema)
+function createFactoryClass(name)
 {
     return new class ModelFactory extends BaseModelFactory
     {
@@ -19,7 +19,7 @@ function createFactoryClass(name,schema)
              * The model slug, if used in a url.
              * @type {string}
              */
-            this.slug = _.snakeCase(name);
+            this.slug = this.table;
 
             /**
              * The singular label for this model.
@@ -35,6 +35,15 @@ function createFactoryClass(name,schema)
         }
 
         /**
+         * Return the protected model name.
+         * @returns {string}
+         */
+        get name()
+        {
+            return name;
+        }
+
+        /**
          * Configure the factory properties.
          * @param opts {Object}
          * @returns {ModelFactory}
@@ -46,20 +55,6 @@ function createFactoryClass(name,schema)
             return this;
         }
 
-        /**
-         * Return the protected model name.
-         * @returns {string}
-         */
-        get name() {
-            return name;
-        }
-
-        get schema() {
-            return schema;
-        }
-        get fields() {
-            return Object.keys(this.schema);
-        }
     }
 }
 
