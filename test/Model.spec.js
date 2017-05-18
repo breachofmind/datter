@@ -1,5 +1,5 @@
 const {MongoDBDriver} = require('../index');
-const ModelFactory    = require('../src/ModelFactory');
+const Factory         = require('../src/Factory');
 const Model           = require('../src/Model');
 const Schema          = require('../src/Schema');
 
@@ -25,7 +25,7 @@ describe('MongoDBModel.js', () => {
         let model = new factory.model({});
         expect(model instanceof Model).toBe(true);
         expect(factory.model.name).toBe('MongoDBModel');
-        expect(model.$factory instanceof ModelFactory).toBe(true);
+        expect(model.$factory instanceof Factory).toBe(true);
         expect(model.$factory).toBe(factory);
     });
 
@@ -71,6 +71,11 @@ describe('MongoDBModel.js', () => {
         expect(model.$modified).toContain('content');
         expect(model.content).toBe('changed content');
 
-        expect(model.$new).toBe(false);
+        expect(model.$new).toBe(true);
     });
+
+});
+
+describe('MongoDBModel.js database methods', () => {
+
 });

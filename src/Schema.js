@@ -4,13 +4,17 @@ const Types = require('./support/types.json');
 
 class Schema extends Map
 {
+    /**
+     * Constructor.
+     * @param factory {Factory}
+     */
     constructor(factory)
     {
         super();
 
         /**
          * Return the protected factory instance.
-         * @type {ModelFactory}
+         * @type {Factory}
          */
         Object.defineProperty(this, 'factory', {
             value: factory

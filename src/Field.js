@@ -79,14 +79,13 @@ class Field
         this.value = null;
     }
 
+    /**
+     * Return the parent schema factory.
+     * @returns {Factory}
+     */
     get factory()
     {
         return this.schema.factory;
-    }
-
-    get models()
-    {
-        return this.factory.driver.models;
     }
 
     /**

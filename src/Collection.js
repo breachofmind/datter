@@ -13,20 +13,41 @@ class Collection extends Array
 
         /**
          * The parent model's factory class.
-         * @type {null|ModelFactory}
+         * @type {null|Factory}
          */
-        this._model = null;
+        this._factory = null;
 
         this.add(items);
     }
 
     /**
      * Return the protected model class.
-     * @returns {null|ModelFactory}
+     * @returns {null|Factory}
+     */
+    get factory()
+    {
+        return this._factory;
+    }
+
+    /**
+     * Return the model class.
+     * @returns {Model|undefined}
      */
     get model()
     {
-        return this._model;
+        if (! this._factory) {
+            return undefined;
+        }
+        return this._factory.model;
+    }
+
+    /**
+     * Check if this collection is empty.
+     * @returns {boolean}
+     */
+    get isEmpty()
+    {
+        return this.length === 0;
     }
 
     /**
@@ -45,12 +66,14 @@ class Collection extends Array
             throw new TypeError("Item is not an instance of model");
         }
 
-        if (! this.model) {
+        if (! this._factory) {
             // Adding the first item sets the collection type.
-            this.model = item.$factory;
-        } else if (item.$factory !== this.model) {
+            this._factory = item.$factory;
+
+        } else if (item.$factory !== this._factory) {
             // All models in a collection need to be of the same type.
-            throw new TypeError('Item is not an instance of ' + this.model.name);
+            throw new TypeError('Item is not an instance of ' + this._factory.name);
+
         } else if (this.includes(item)) {
             // We're not adding more than one instance of the item.
             return this;

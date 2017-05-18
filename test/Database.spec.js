@@ -1,5 +1,5 @@
 const {MongoDBDriver} = require('../index');
-const ModelFactory    = require('../src/ModelFactory');
+const Factory         = require('../src/Factory');
 const Model           = require('../src/Model');
 const Schema          = require('../src/Schema');
 
@@ -29,7 +29,7 @@ describe('MongoDBDriver.js', function()
 
         driver.connect().then(db =>
         {
-            expect(driver.connected).toBe(true);
+            expect(driver.isConnected).toBe(true);
             expect(db.databaseName).toEqual(DB_NAME);
             done();
         }).catch(err => {
@@ -39,9 +39,9 @@ describe('MongoDBDriver.js', function()
 
     it("should disconnect", (done) =>
     {
-        expect(driver.connected).toBe(true);
+        expect(driver.isConnected).toBe(true);
         driver.disconnect().then(result => {
-            expect(driver.connected).toBe(false);
+            expect(driver.isConnected).toBe(false);
             expect(result).toBe(true);
             done();
         }).catch(err => {
@@ -52,7 +52,7 @@ describe('MongoDBDriver.js', function()
     it("should connect and emit events", (done) =>
     {
         let value = false;
-        expect(driver.connected).toEqual(false);
+        expect(driver.isConnected).toEqual(false);
         function testEvent() {
             value = true;
         }
@@ -79,9 +79,9 @@ describe('MongoDBDriver.js Model factory', function()
 
     it("should create a model factory class", () => {
         factory = driver.model(testModelName);
-        expect(factory instanceof ModelFactory).toBe(true);
+        expect(factory instanceof Factory).toBe(true);
         expect(factory.name).toEqual(testModelName);
-        expect(driver.models[testModelName]).toEqual(factory);
+        expect(driver.factories[testModelName]).toEqual(factory);
     });
     it("should create a schema instance in the factory", () => {
         expect(factory.schema instanceof Schema).toBe(true);

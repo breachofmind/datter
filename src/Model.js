@@ -13,7 +13,7 @@ class Model
     constructor(attributes)
     {
         /**
-         * Is this a newly created model, not modified?
+         * Is this a newly created model that hasn't been saved yet?
          * @type {boolean}
          */
         this.$new = true;
@@ -31,19 +31,30 @@ class Model
         this.$attributes = {};
 
         // Call the private init() method.
+        // Fill the attribute values.
         init.call(this,attributes);
 
-        // Fill the attribute values.
         this.fill(attributes);
     }
 
     /**
      * Implementation of factory getter.
      * @throws {Error}
+     * @returns {Factory}
      */
     get $factory()
     {
-        throw new Error('unimplemented $factory in Model');
+        throw new Error('unimplemented getter $factory in Model');
+    }
+
+    /**
+     * Implementation of factory static getter.
+     * @throws {Error}
+     * @returns {Factory}
+     */
+    static get factory()
+    {
+        throw new Error('unimplemented static getter factory() in Model');
     }
 
     /**
@@ -130,7 +141,6 @@ function init(attributes)
              */
             set(newValue)
             {
-                this.$new = false;
                 this.$attributes[field.name] = newValue;
 
                 if (! this.$modified.includes(field.name)) {

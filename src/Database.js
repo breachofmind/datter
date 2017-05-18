@@ -1,6 +1,6 @@
 const EventEmitter = require('events');
 const Model        = require('./Model');
-const ModelFactory = require('./ModelFactory');
+const Factory      = require('./Factory');
 const _            = require('lodash');
 
 class Database extends EventEmitter
@@ -28,11 +28,18 @@ class Database extends EventEmitter
         this._url = url;
 
         /**
-         * Created model factories.
+         * Created model classes.
          * @type {{}}
          * @private
          */
         this._models = {};
+
+        /**
+         * Created factory definitions.
+         * @type {{}}
+         * @private
+         */
+        this._factories = {};
     }
 
 
@@ -41,7 +48,7 @@ class Database extends EventEmitter
      * Check if the database is connected.
      * @returns {boolean}
      */
-    get connected()
+    get isConnected()
     {
         return this._db !== null;
     }
@@ -74,12 +81,21 @@ class Database extends EventEmitter
     }
 
     /**
-     * Return the protected models object.
+     * Return the protected models map.
      * @returns {{}}
      */
     get models()
     {
         return this._models;
+    }
+
+    /**
+     * Return the protected factories map.
+     * @returns {{}}
+     */
+    get factories()
+    {
+        return this._factories;
     }
 
     /**
@@ -124,19 +140,21 @@ class Database extends EventEmitter
     /**
      * Create a new model with the given schema.
      * @param name {string}
-     * @returns {ModelFactory}
+     * @param fn {Function}
+     * @returns {Factory}
      */
-    model(name)
+    model(name, fn)
     {
-        let factory = new ModelFactory(name, this);
-        let Model = this.getModelClass(factory);
+        let factory = new Factory(name, this);
 
-        // Assign a property on the factory the model class constructor.
-        Object.defineProperty(factory,'model', {
-            value: Model
-        });
+        // Call the configuration function, if provided.
+        if (typeof fn === 'function') {
+            fn.call(factory,factory.schema);
+        }
+        this._models[factory.name] = factory.model;
+        this._factories[factory.name] = factory;
 
-        return this._models[factory.name] = factory;
+        return factory;
     }
 }
 

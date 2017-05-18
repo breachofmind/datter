@@ -11,7 +11,7 @@ class MongoDBDriver extends Database
      */
     connect()
     {
-        if (this.connected) {
+        if (this.isConnected) {
             return Promise.resolve(this.instance);
         }
         return new Promise((resolve,reject) =>
@@ -35,7 +35,7 @@ class MongoDBDriver extends Database
      */
     disconnect()
     {
-        if (this.connected) {
+        if (this.isConnected) {
             return this.instance.logout().then(result => {
                 this.instance = null;
                 return result;
@@ -46,7 +46,7 @@ class MongoDBDriver extends Database
 
     /**
      * Return a class constructor for a model.
-     * @param factory {ModelFactory}
+     * @param factory {Factory}
      * @returns {Model}
      */
     getModelClass(factory)

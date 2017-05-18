@@ -1,8 +1,9 @@
 const EventEmitter = require('events');
 const Schema       = require('./Schema');
+const Collection   = require('./Collection');
 const _            = require('lodash');
 
-class ModelFactory extends EventEmitter
+class Factory extends EventEmitter
 {
     /**
      * Constructor.
@@ -22,6 +23,10 @@ class ModelFactory extends EventEmitter
             value: name
         });
 
+        /**
+         * The parent database driver.
+         * @type {Database}
+         */
         Object.defineProperty(this, 'db', {
             value: db
         });
@@ -32,6 +37,14 @@ class ModelFactory extends EventEmitter
          */
         Object.defineProperty(this, 'schema', {
             value: new Schema(this)
+        });
+
+        /**
+         * Create a Model class constructor.
+         * @type {Function}
+         */
+        Object.defineProperty(this, 'model', {
+            value: db.getModelClass(this)
         });
 
         /**
@@ -60,12 +73,17 @@ class ModelFactory extends EventEmitter
     }
 
     /**
-     * Create a new model with given attributes.
+     * Create a new model(s) with given attributes.
      * @param attributes {object}
-     * @returns {Model}
+     * @returns {Model|Collection}
      */
     create(attributes={})
     {
+        if (Array.isArray(attributes)) {
+            return new Collection(attributes.map(attrs => {
+                return this.create(attrs);
+            }));
+        }
         let object = new (this.model)(attributes);
 
         this.emit('create', object);
@@ -76,7 +94,7 @@ class ModelFactory extends EventEmitter
     /**
      * Configure the factory properties.
      * @param opts {Object}
-     * @returns {ModelFactory}
+     * @returns {Factory}
      */
     configure(opts={})
     {
@@ -88,4 +106,4 @@ class ModelFactory extends EventEmitter
 }
 
 
-module.exports = ModelFactory;
+module.exports = Factory;
