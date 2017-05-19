@@ -88,6 +88,27 @@ class Collection extends Array
 
         return this;
     }
+
+    /**
+     * Concatenate two collections and return a new collection of the result.
+     * @param arr {Array|Collection|Model}
+     * @returns {Collection}
+     */
+    concat(arr)
+    {
+        return new Collection(super.concat(this,arr));
+    }
+
+    /**
+     * Convert collection to a JSON array.
+     * @returns {Array}
+     */
+    toJSON()
+    {
+        return this.map(item => {
+            return item.toJSON();
+        });
+    }
 }
 
 module.exports = Collection;

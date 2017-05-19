@@ -107,6 +107,8 @@ describe('MongoDBModel.js database methods', () => {
             expect(results[0] instanceof factory.model).toBe(true);
 
             done();
+        }).catch(err => {
+            done.fail(err);
         })
 
 
